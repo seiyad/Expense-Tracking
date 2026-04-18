@@ -221,3 +221,8 @@ a {
     background:#ff3b3b;
     transition:0.4s;
 }
+#editBudgetBtn{
+    padding: 10px;
+    background-color: #0d346f;
+    border:1px solid blue;
+}

@@ -65,6 +65,8 @@ onAuthStateChanged(auth, (user) => {
 
     const expenseRef = collection(db, "users", user.uid, "expenses");
 
+    let budgetAlertShown = false;
+
     onSnapshot(expenseRef, (snapshot) => {
         let totalSpent = 0;
         let highestExpense = 0;
@@ -88,6 +90,15 @@ onAuthStateChanged(auth, (user) => {
                 }
             }
         });
+
+        if (totalSpent >= monthlySalary && !budgetAlertShown) {
+            budgetAlertShown = true;
+            alert(" Budget limit reached! You have used your entire monthly budget. No more expenses can be added.");
+        }
+
+        if (totalSpent < monthlySalary) {
+            budgetAlertShown = false;
+        }
 
         const remaining = monthlySalary - totalSpent;
         const percent = monthlySalary > 0 ? Math.min((totalSpent / monthlySalary) * 100, 100).toFixed(1) : 0;
