@@ -37,6 +37,7 @@ const frmEl = document.querySelector("#frm");
 const tblBodyEl = document.querySelector("#tblBody");
 
 let currentUserId = null;
+let currentTotalSpent = 0;
 
 async function deleteOldExpenses(userId) {
     const now = new Date();
@@ -63,6 +64,23 @@ onAuthStateChanged(auth, (user) => {
 
     onSnapshot(q, (snapshot) => {
         tblBodyEl.innerHTML = "";
+
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        currentTotalSpent = 0;
+        snapshot.docs.forEach((docSnap) => {
+            const expense = docSnap.data();
+            const expDate = new Date(expense.date);
+            if (
+                expDate.getMonth() === currentMonth &&
+                expDate.getFullYear() === currentYear
+            ) {
+                currentTotalSpent += expense.amount;
+            }
+        });
+
         if (!snapshot.empty) {
             snapshot.docs.forEach((docSnap, index) => {
                 const expense = docSnap.data();
@@ -109,11 +127,26 @@ frmEl.addEventListener("submit", async function(e) {
         return;
     }
 
+    const salaryKey = `monthlySalary_${currentUserId}`;
+    const monthlySalary = parseFloat(localStorage.getItem(salaryKey)) || 0;
+    const newAmount = Number(amountEl.value.trim());
+
+    if (monthlySalary > 0 && !idEl.value) {
+        if (currentTotalSpent >= monthlySalary) {
+            alert("⚠️ Budget limit reached! You cannot add more expenses this month.");
+            return;
+        }
+        if (currentTotalSpent + newAmount > monthlySalary) {
+            alert(`⚠️ This expense exceeds your budget! You can only spend ₹${(monthlySalary - currentTotalSpent).toFixed(2)} more.`);
+            return;
+        }
+    }
+
     const expenseData = {
         name: nameEl.value.trim(),
         catagorie: catagorieEl.value.trim(),
         date: dateEl.value.trim(),
-        amount: Number(amountEl.value.trim()),
+        amount: newAmount,
         time: new Date().toLocaleTimeString()
     };
 
