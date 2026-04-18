@@ -55,6 +55,7 @@ onAuthStateChanged(auth, (user) => {
     }
 
     editBudgetBtn.addEventListener("click", () => {
+        preventdefault()
         const input = prompt(`Current budget: ₹${monthlySalary}\nEnter new monthly budget (₹):`);
         const entered = parseFloat(input);
         if (!isNaN(entered) && entered > 0) {
