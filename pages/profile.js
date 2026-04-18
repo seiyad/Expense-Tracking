@@ -17,7 +17,6 @@ const Profile = document.getElementById("profileAvatar");
 const App = document.getElementById("displayApp");
 const Name = document.getElementById("displayUserName");
 const Email = document.getElementById("displayEmail");
-const UserId = document.getElementById("displayUserId");
 const CreateDate = document.getElementById("displayCreatedDate");
 const logoutBtn = document.getElementById("logoutButton");
 
@@ -46,7 +45,6 @@ onAuthStateChanged(auth, async (user) => {
     App.textContent = name;
     Name.textContent = name;
     Email.textContent = updatedUser.email;
-    UserId.textContent = updatedUser.uid;
     CreateDate.textContent = date;
     Profile.textContent = name.charAt(0).toUpperCase();
   }
