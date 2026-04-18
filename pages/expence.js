@@ -132,12 +132,16 @@ frmEl.addEventListener("submit", async function(e) {
     const newAmount = Number(amountEl.value.trim());
 
     if (monthlySalary > 0 && !idEl.value) {
+        if (newAmount > monthlySalary) {
+            alert(` Single expense cannot be greater than your monthly budget of ₹${monthlySalary.toFixed(2)}!`);
+            return;
+        }
         if (currentTotalSpent >= monthlySalary) {
-            alert("⚠️ Budget limit reached! You cannot add more expenses this month.");
+            alert(" Budget limit reached! You cannot add more expenses this month.");
             return;
         }
         if (currentTotalSpent + newAmount > monthlySalary) {
-            alert(`⚠️ This expense exceeds your budget! You can only spend ₹${(monthlySalary - currentTotalSpent).toFixed(2)} more.`);
+            alert(` This expense exceeds your budget! You can only spend ₹${(monthlySalary - currentTotalSpent).toFixed(2)} more.`);
             return;
         }
     }
