@@ -92,8 +92,8 @@ onAuthStateChanged(auth, (user) => {
                         <td>${expense.catagorie}</td>
                         <td>${expense.date}</td>
                         <td>₹${expense.amount}</td>
-                        <td><button type="button" class="btn-edit" data-id="${expenseID}">Edit</button></td>
-                        <td><button type="button" class="btn-delete" data-id="${expenseID}">Delete</button></td>
+                        <td><button type="button" class="btn-edit" data-id="${expenseID}"><p>EDIT</p></button></td>
+                        <td><button type="button" class="btn-delete" data-id="${expenseID}"><p>DELETE</p></button></td>
                     </tr>
                 `;
             });
