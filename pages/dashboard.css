@@ -225,4 +225,5 @@ a {
     padding: 10px;
     background-color: #0d346f;
     border:1px solid blue;
+    border-radius: 10px;
 }
