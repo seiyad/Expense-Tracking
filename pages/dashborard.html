@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Trakker</title>
+  <link rel="stylesheet" href="./dashboard.css">
+  <link rel="icon" type="image/x-icon" href="../assest/expense logo.png" height="50px" width="50px">
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <div class="logo"><img src="../assest/expense logo.png" alt="" height="130px" width="300px"></div>
+
+    <div class="nav-links">
+      <a href="../pages/dashborard.html">Dashboard</a>
+      <a href="../pages/expence.html">Expense</a>
+      <a href="../pages/profile.html">Profile</a>
+      <button id="logout">Logout</button>
+    </div>
+
+  </nav>
+
+  <section class="container">
+    <h1>Dashboard</h1>
+
+    <div class="cards">
+
+      <div class="card red">
+        <h3>Total Spent (This Month)</h3>
+        <div class="amount" id="totalSpent">₹0.00</div>
+      </div>
+
+      <div class="card green">
+        <h3>Remaining Budget</h3>
+        <div class="amount" id="remainingBudget">₹0.00</div>
+      </div>
+
+      <div class="card blue">
+        <h3>Highest Expense</h3>
+        <div class="amount" id="highestExpense">₹0.00</div>
+      </div>
+
+    </div>
+
+
+    <div class="card" style="margin-top:30px;">
+      <h3>Monthly Progress</h3>
+
+      <div class="contain">
+        <div id="monthlyProgressBar" class="brogress">
+        </div>
+      </div>
+
+      <p id="progressText" style="margin-top:10px;">
+        0% of monthly budget used
+      </p>
+      <p id="progressamount"></p>
+    </div>
+
+  </section>
+
+  <footer>
+    &copy; Expense Tracker
+  </footer>
+
+  <script type="module" src="./dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Expense Trakker</title>
+  <link rel="stylesheet" href="profile.css">
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="profile-avatar" id="profileAvatar"></div>
+  </div>
+
+  <a href="../pages/dashborard.html">
+    <button>
+      <div class="h">Home</div>
+    </button>
+  </a>
+
+  <div class="container">
+
+    <div class="name">
+      <h2 id="displayApp"></h2>
+      <p>Expense Tracker User</p>
+    </div>
+    <div class="customer">
+      <span>Name:</span>
+      <span id="displayUserName"></span>
+
+      <span>Email:</span>
+      <span id="displayEmail"></span>
+
+      <span>User ID:</span>
+      <span id="displayUserId"></span>
+
+      <span>Account Type:</span>
+      <span>Standard</span>
+
+      <span>Created On:</span>
+      <span id="displayCreatedDate"></span>
+    </div>
+
+    <div class="section">
+      <h3>About Me</h3>
+      <p>
+        I use this expense tracker to manage my daily income and expenses.
+      </p>
+    </div>
+
+    <button id="logoutButton">
+      <div class="h">Logout</div>
+    </button>
+
+  </div>
+
+  <footer>
+    &copy; Expense Tracker
+  </footer>
+
+  <script type="module" src="./profile.js"></script>
+
+</body>
+</html>

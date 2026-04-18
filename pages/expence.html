@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Expense</title>
+  <link rel="icon" type="image/x-icon" href="../assest/f9133a4dc4f047f835cef3115b270ac3.jpg">
+  <link rel="stylesheet" href="expence.css">
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+       <div class="logo"><img src="../assest/expense logo.png" alt="" height="130px" width="300px"></div>
+    </div>
+
+    <nav class="nav-links">
+      <a href="dashborard.html">Dashboard</a>
+      <a href="expence.html">Expense</a>
+       <a href="profile.html">Profile</a>
+    </nav>
+    <button id="logout">logout</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+     <div class="search-profile">
+  
+  <!-- <input type="text" placeholder="Search..."> -->
+</div>
+    <h1>All Expenses</h1>
+
+    <form action="#" id="frm">
+      <input type="hidden" id="id" />
+
+      <label>Add Expense Name</label>
+      <input type="text" id="ExpenseName" placeholder="Expense Name" />
+
+      <label>Add Expense Category</label>
+      <input type="text" id="ExpenseCatagorie" placeholder="Category" />
+
+      <label>Add Expense Date</label>
+      <input type="date" id="Date" />
+
+      <label>Add Expense Amount</label>
+      <input type="number" id="Amount" placeholder="Amount" />
+
+      <button type="submit" id="submit">
+        <ion-icon name="save-outline"></ion-icon>
+      </button>
+    </form>
+
+    <table class="expense-table" id="expense-tbl">
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Expense Name</th>
+          <th>Category</th>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+
+  </div>
+
+  <footer>&copy; Expense Tracker</footer>
+
+  <script src="../pages/expence.js" type="module"></script>
+
+  <script type="module"
+    src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js">
+  </script>
+  <script nomodule
+    src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js">
+  </script>
+
+</body>
+</html>
