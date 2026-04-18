@@ -27,6 +27,7 @@ const highestExpenseEl = document.getElementById("highestExpense");
 const progressBar = document.getElementById("monthlyProgressBar");
 const progressText = document.getElementById("progressText");
 const progressAmount = document.getElementById("progressamount");
+const editBudgetBtn = document.getElementById("editBudgetBtn");
 
 logoutBtn.addEventListener("click", () => {
     signOut(auth).then(() => {
@@ -40,30 +41,34 @@ onAuthStateChanged(auth, (user) => {
         return;
     }
 
-    
     const salaryKey = `monthlySalary_${user.uid}`;
-    const monthlySalary = parseFloat(localStorage.getItem(salaryKey)) || 0;
+    let monthlySalary = parseFloat(localStorage.getItem(salaryKey)) || 0;
 
     if (!monthlySalary) {
-        
         const input = prompt("Enter your monthly budget (₹):");
         const entered = parseFloat(input);
         if (!isNaN(entered) && entered > 0) {
             localStorage.setItem(salaryKey, entered);
-            location.reload(); 
+            location.reload();
         }
         return;
     }
 
-   
+    editBudgetBtn.addEventListener("click", () => {
+        const input = prompt(`Current budget: ₹${monthlySalary}\nEnter new monthly budget (₹):`);
+        const entered = parseFloat(input);
+        if (!isNaN(entered) && entered > 0) {
+            monthlySalary = entered;
+            localStorage.setItem(salaryKey, entered);
+        }
+    });
+
     const expenseRef = collection(db, "users", user.uid, "expenses");
 
-  
     onSnapshot(expenseRef, (snapshot) => {
         let totalSpent = 0;
         let highestExpense = 0;
 
-        
         const now = new Date();
         const currentMonth = now.getMonth();
         const currentYear = now.getFullYear();
@@ -72,7 +77,6 @@ onAuthStateChanged(auth, (user) => {
             const expense = docSnap.data();
             const expDate = new Date(expense.date);
 
-           
             if (
                 expDate.getMonth() === currentMonth &&
                 expDate.getFullYear() === currentYear
@@ -86,14 +90,12 @@ onAuthStateChanged(auth, (user) => {
         });
 
         const remaining = monthlySalary - totalSpent;
-        const percent = monthlySalary > 0? Math.min((totalSpent / monthlySalary) * 100, 100).toFixed(1): 0;
+        const percent = monthlySalary > 0 ? Math.min((totalSpent / monthlySalary) * 100, 100).toFixed(1) : 0;
 
-       
         totalSpentEl.textContent      = `₹${totalSpent.toFixed(2)}`;
         remainingBudgetEl.textContent = `₹${remaining.toFixed(2)}`;
         highestExpenseEl.textContent  = `₹${highestExpense.toFixed(2)}`;
 
-        
         progressBar.style.width           = `${percent}%`;
         progressBar.style.backgroundColor = percent > 80 ? "#e74c3c" : "#2ecc71";
         progressText.textContent          = `${percent}% of monthly budget used`;
