@@ -93,10 +93,6 @@ body {
 
 .container h1 {
   margin-bottom: 30px;
-
-  background: linear-gradient(#6028e2, #d5bbff);
-  background: -webkit-linear-gradient(#6028e2, #d5bbff);
-
   background-clip: text;
   -webkit-background-clip: text;
 
