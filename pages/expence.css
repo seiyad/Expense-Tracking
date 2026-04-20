@@ -43,30 +43,6 @@ body {
   color: #ffffff;
 }
 
-.search-profile {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-
-
-.search-profile input {
-  padding: 10px 16px 10px 40px;
-  border-radius: 100px;
-  border: 1px solid #27272a;
-  outline: none;
-  background-color: #1c1c24;
-  color: #ffffff;
-  width: 250px;
-
-  background-image: url("https://cdn-icons-png.flaticon.com/512/622/622669.png");
-  background-size: 16px;
-  background-repeat: no-repeat;
-  background-position: 12px center;
-}
-
-
 
 .profile {
   width: 40px;
@@ -93,10 +69,6 @@ body {
 
 .container h1 {
   margin-bottom: 30px;
-  background-clip: text;
-  -webkit-background-clip: text;
-
-  -webkit-text-fill-color: transparent;
 }
 
 
