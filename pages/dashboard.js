@@ -100,7 +100,7 @@ onAuthStateChanged(auth, (user) => {
             budgetAlertShown = false;
         }
 
-        const remaining = monthlySalary - totalSpent;
+        const remaining = (monthlySalary+entered)-totalSpent;
         const percent = monthlySalary > 0 ? Math.min((totalSpent / monthlySalary) * 100, 100).toFixed(1) : 0;
 
         totalSpentEl.textContent      = `₹${totalSpent.toFixed(2)}`;
