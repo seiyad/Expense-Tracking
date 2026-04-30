@@ -58,8 +58,8 @@ onAuthStateChanged(auth, (user) => {
         const input = prompt(`Current budget: ₹${monthlySalary}\nEnter new monthly budget (₹):`);
         const entered = parseFloat(input);
         if (!isNaN(entered) && entered > 0) {
-            monthlySalary = entered;
-            localStorage.setItem(salaryKey, entered);
+            monthlySalary = entered+monthlySalary;
+            localStorage.setItem(salaryKey, entered+monthlySalary);
         }
     });
 
