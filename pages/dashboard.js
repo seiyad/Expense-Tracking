@@ -159,7 +159,7 @@ onAuthStateChanged(auth, (user) => {
 
   const salaryKey = `monthlySalary_${user.uid}`;
 
-  // FIX 1: Load budget from localStorage; prompt only if not set
+ 
   let monthlySalary = parseFloat(localStorage.getItem(salaryKey)) || 0;
 
   if (!monthlySalary) {
@@ -169,18 +169,17 @@ onAuthStateChanged(auth, (user) => {
       localStorage.setItem(salaryKey, entered);
       monthlySalary = entered;
     } else {
-      return; // Don't proceed if invalid input
+      return; 
     }
   }
 
-  // FIX 2: editBudgetBtn — allow user to SET a new budget (replace, not add)
-  // If you want to ADD to budget instead, change the comment below
+  
   editBudgetBtn.addEventListener("click", () => {
     const input = prompt(`Current budget: ₹${monthlySalary}\nEnter new monthly budget (₹):`);
     const entered = parseFloat(input);
     if (!isNaN(entered) && entered > 0) {
-      monthlySalary = entered;                          // FIX: replace, not double-add
-      localStorage.setItem(salaryKey, monthlySalary);  // FIX: save correct value
+      monthlySalary = entered;                         
+      localStorage.setItem(salaryKey, monthlySalary);  
     }
   });
 
@@ -212,17 +211,17 @@ onAuthStateChanged(auth, (user) => {
       }
     });
 
-    // Budget alert logic
+    
     if (totalSpent >= monthlySalary && !budgetAlertShown) {
       budgetAlertShown = true;
-      alert("⚠️ Budget limit reached! You have used your entire monthly budget.");
+      alert(" Budget limit reached! You have used your entire monthly budget.");
     }
 
     if (totalSpent < monthlySalary) {
       budgetAlertShown = false;
     }
 
-    // FIX 3: Use monthlySalary directly — no reference to undefined `entered`
+    
     const remaining = monthlySalary - totalSpent;
     const percent   = monthlySalary > 0
       ? Math.min((totalSpent / monthlySalary) * 100, 100).toFixed(1)
