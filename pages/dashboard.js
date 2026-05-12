@@ -20,14 +20,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const logoutBtn        = document.getElementById("logout");
-const totalSpentEl     = document.getElementById("totalSpent");
+const logoutBtn         = document.getElementById("logout");
+const totalSpentEl      = document.getElementById("totalSpent");
 const remainingBudgetEl = document.getElementById("remainingBudget");
-const highestExpenseEl = document.getElementById("highestExpense");
-const progressBar      = document.getElementById("monthlyProgressBar");
-const progressText     = document.getElementById("progressText");
-const progressAmount   = document.getElementById("progressamount");
-const editBudgetBtn    = document.getElementById("editBudgetBtn");
+const highestExpenseEl  = document.getElementById("highestExpense");
+const progressBar       = document.getElementById("monthlyProgressBar");
+const progressText      = document.getElementById("progressText");
+const progressAmount    = document.getElementById("progressamount");
+const editBudgetBtn     = document.getElementById("editBudgetBtn");
 
 logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => {
@@ -43,7 +43,6 @@ onAuthStateChanged(auth, (user) => {
 
   const salaryKey = `monthlySalary_${user.uid}`;
 
- 
   let monthlySalary = parseFloat(localStorage.getItem(salaryKey)) || 0;
 
   if (!monthlySalary) {
@@ -53,17 +52,18 @@ onAuthStateChanged(auth, (user) => {
       localStorage.setItem(salaryKey, entered);
       monthlySalary = entered;
     } else {
-      return; 
+      return;
     }
   }
 
-  
+  // ✅ OLD budget + NEW amount = updated total budget
   editBudgetBtn.addEventListener("click", () => {
-    const input = prompt(`Current budget: ₹${monthlySalary}\nEnter new monthly budget (₹):`);
+    const input = prompt(`Current budget: ₹${monthlySalary}\nEnter amount to ADD to budget (₹):`);
     const entered = parseFloat(input);
     if (!isNaN(entered) && entered > 0) {
-      monthlySalary = entered;                         
-      localStorage.setItem(salaryKey, monthlySalary);  
+      monthlySalary = monthlySalary + entered;
+      localStorage.setItem(salaryKey, monthlySalary);
+      alert(`✅ Budget updated! New total budget: ₹${monthlySalary.toFixed(2)}`);
     }
   });
 
@@ -95,7 +95,6 @@ onAuthStateChanged(auth, (user) => {
       }
     });
 
-    
     if (totalSpent >= monthlySalary && !budgetAlertShown) {
       budgetAlertShown = true;
       alert(" Budget limit reached! You have used your entire monthly budget.");
@@ -105,7 +104,6 @@ onAuthStateChanged(auth, (user) => {
       budgetAlertShown = false;
     }
 
-    
     const remaining = monthlySalary - totalSpent;
     const percent   = monthlySalary > 0
       ? Math.min((totalSpent / monthlySalary) * 100, 100).toFixed(1)
@@ -115,9 +113,9 @@ onAuthStateChanged(auth, (user) => {
     remainingBudgetEl.textContent  = `₹${remaining.toFixed(2)}`;
     highestExpenseEl.textContent   = `₹${highestExpense.toFixed(2)}`;
 
-    progressBar.style.width            = `${percent}%`;
-    progressBar.style.backgroundColor  = percent > 80 ? "#e74c3c" : "#2ecc71";
-    progressText.textContent           = `${percent}% of monthly budget used`;
-    progressAmount.textContent         = `₹${totalSpent.toFixed(2)} spent of ₹${monthlySalary.toFixed(2)}`;
+    progressBar.style.width           = `${percent}%`;
+    progressBar.style.backgroundColor = percent > 80 ? "#e74c3c" : "#2ecc71";
+    progressText.textContent          = `${percent}% of monthly budget used`;
+    progressAmount.textContent        = `₹${totalSpent.toFixed(2)} spent of ₹${monthlySalary.toFixed(2)}`;
   });
 });
