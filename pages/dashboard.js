@@ -56,14 +56,14 @@ onAuthStateChanged(auth, (user) => {
     }
   }
 
-  // ✅ OLD budget + NEW amount = updated total budget
+ 
   editBudgetBtn.addEventListener("click", () => {
     const input = prompt(`Current budget: ₹${monthlySalary}\nEnter amount to ADD to budget (₹):`);
     const entered = parseFloat(input);
     if (!isNaN(entered) && entered > 0) {
       monthlySalary = monthlySalary + entered;
       localStorage.setItem(salaryKey, monthlySalary);
-      alert(`✅ Budget updated! New total budget: ₹${monthlySalary.toFixed(2)}`);
+      alert(` Budget updated! New total budget: ₹${monthlySalary.toFixed(2)}`);
     }
   });
 
