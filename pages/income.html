@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Income Tracker</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="Income.css" />
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, collection, addDoc, onSnapshot,
+      deleteDoc, doc, updateDoc, query, orderBy,
+      getDoc, setDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ✅ உங்கள் Firebase config இங்கே வையுங்கள்
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ─── State Variables ───────────────────────────────
+    let currentUserId = null;
+    let incomes = [];
+    let editId = '';
+    let unsubscribeSnapshot = null;
+
+    // ─── Helper: Current Month Key ─────────────────────
+    function getCurrentMonthKey() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    // ─── Helper: Render Incomes Table ──────────────────
+    function renderIncomes() {
+      const tbody = document.getElementById('income-tbody');
+      tbody.innerHTML = '';
+
+      if (incomes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6">No Record Found</td></tr>`;
+        return;
+      }
+
+      incomes.forEach((income, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${income.name}</td>
+          <td>${income.date}</td>
+          <td>₹${(Number(income.amount) || 0).toFixed(2)}</td>
+          <td><button class="btn-edit" data-id="${income.id}">EDIT</button></td>
+          <td><button class="btn-delete" data-id="${income.id}">DELETE</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const income = incomes.find(i => i.id === btn.dataset.id);
+          if (income) handleEdit(income);
+        });
+      });
+
+      document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', () => handleDelete(btn.dataset.id));
+      });
+    }
+
+    // ─── Helper: Update Budget Display ────────────────
+    function updateBudgetDisplay() {
+      const salaryKey = `monthlySalary_${currentUserId}`;
+      const currentBudget = parseFloat(localStorage.getItem(salaryKey)) || 0;
+
+      const now = new Date();
+      const currentMonthIncomeTotal = incomes
+        .filter(inc => {
+          const d = new Date(inc.date);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        })
+        .reduce((sum, inc) => sum + inc.amount, 0);
+
+      document.getElementById('monthly-budget').textContent =
+        `₹${(Number(currentBudget) || 0).toFixed(2)}`;
+      document.getElementById('month-income').textContent =
+        `₹${(Number(currentMonthIncomeTotal) || 0).toFixed(2)}`;
+    }
+
+    // ─── Clear Form ────────────────────────────────────
+    function clearForm() {
+      editId = '';
+      document.getElementById('income-name').value = '';
+      document.getElementById('income-date').value = '';
+      document.getElementById('income-amount').value = '';
+      document.getElementById('submit').textContent = 'Save & Add to Budget';
+      document.getElementById('cancel-btn').style.display = 'none';
+    }
+
+    // ─── Handle Edit ───────────────────────────────────
+    function handleEdit(income) {
+      editId = income.id;
+      document.getElementById('income-name').value = income.name;
+      document.getElementById('income-date').value = income.date;
+      document.getElementById('income-amount').value = String(income.amount);
+      document.getElementById('submit').textContent = 'Update';
+      document.getElementById('cancel-btn').style.display = 'inline-block';
+    }
+
+    // ─── Handle Delete ─────────────────────────────────
+    async function handleDelete(id) {
+      if (window.confirm('Are you sure to delete?')) {
+        await deleteDoc(doc(db, 'users', currentUserId, 'incomes', id));
+      }
+    }
+
+    // ─── Handle Submit ─────────────────────────────────
+    async function handleSubmit(e) {
+      e.preventDefault();
+
+      if (!currentUserId) { alert('You must be logged in'); return; }
+
+      const incomeName = document.getElementById('income-name').value;
+      const incomeDate = document.getElementById('income-date').value;
+      const incomeAmount = document.getElementById('income-amount').value;
+
+      if (!incomeName.trim() || !incomeDate.trim() || !incomeAmount.trim()) {
+        alert('Please fill all details'); return;
+      }
+
+      const selectedDate = new Date(incomeDate);
+      const now = new Date();
+      if (
+        selectedDate.getMonth() !== now.getMonth() ||
+        selectedDate.getFullYear() !== now.getFullYear()
+      ) {
+        alert('You can only add income for the current month!'); return;
+      }
+
+      const incomeData = {
+        name: incomeName.trim(),
+        date: incomeDate.trim(),
+        amount: Number(incomeAmount.trim()),
+        time: new Date().toLocaleTimeString()
+      };
+
+      const incomeRef = collection(db, 'users', currentUserId, 'incomes');
+
+      if (editId) {
+        await updateDoc(doc(db, 'users', currentUserId, 'incomes', editId), incomeData);
+      } else {
+        await addDoc(incomeRef, incomeData);
+      }
+
+      clearForm();
+    }
+
+    // ─── Auth State Changed ────────────────────────────
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = '/index.html';
+        return;
+      }
+
+      currentUserId = user.uid;
+      const salaryKey = `monthlySalary_${user.uid}`;
+      const monthKey = getCurrentMonthKey();
+
+      const existingBudget = parseFloat(localStorage.getItem(salaryKey)) || 0;
+      document.getElementById('monthly-budget').textContent =
+        `₹${existingBudget.toFixed(2)}`;
+
+      const incomeRef = collection(db, 'users', user.uid, 'incomes');
+      const q = query(incomeRef, orderBy('date', 'desc'));
+
+      unsubscribeSnapshot = onSnapshot(q, async (snapshot) => {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        let currentIncomeTotal = 0;
+        incomes = snapshot.docs.map(docSnap => {
+          const income = docSnap.data();
+          const incDate = new Date(income.date);
+          if (
+            incDate.getMonth() === currentMonth &&
+            incDate.getFullYear() === currentYear
+          ) {
+            currentIncomeTotal += income.amount;
+          }
+          return { id: docSnap.id, ...income };
+        });
+
+        renderIncomes();
+        updateBudgetDisplay();
+
+        const incomeStatsRef = doc(db, 'users', user.uid, 'income_stats', monthKey);
+        const incomeStatsSnap = await getDoc(incomeStatsRef);
+        const storedIncomeTotal = incomeStatsSnap.exists()
+          ? incomeStatsSnap.data().totalIncome || 0
+          : 0;
+
+        const diff = currentIncomeTotal - storedIncomeTotal;
+        if (diff !== 0) {
+          const existingBudget = parseFloat(localStorage.getItem(salaryKey)) || 0;
+          const newTotalBudget = existingBudget + diff;
+          localStorage.setItem(salaryKey, newTotalBudget.toString());
+
+          document.getElementById('monthly-budget').textContent =
+            `₹${newTotalBudget.toFixed(2)}`;
+
+          await setDoc(incomeStatsRef, {
+            totalIncome: currentIncomeTotal,
+            monthKey: monthKey,
+            updatedAt: new Date()
+          }, { merge: true });
+        }
+      });
+    });
+
+    // ─── DOM Ready ─────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('income-form').addEventListener('submit', handleSubmit);
+      document.getElementById('cancel-btn').addEventListener('click', clearForm);
+      document.getElementById('logout').addEventListener('click', () => {
+        signOut(auth).then(() => window.location.href = '/index.html');
+      });
+    });
+
+  </script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">
+      <img src="/expense-logo.png" alt="Expense Tracker" />
+    </div>
+    <nav class="nav-links">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/expense.html">Expense</a>
+      <a href="/income.html">Income</a>
+      <a href="/profile.html">Profile</a>
+    </nav>
+    <button id="logout">Logout</button>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    <h1>All Incomes</h1>
+
+    <!-- Budget Badge -->
+    <div class="income-total-badge">
+      <div><strong>Monthly Budget:</strong> <span id="monthly-budget">₹0.00</span></div>
+      <div><strong>This Month Income:</strong> <span id="month-income">₹0.00</span></div>
+      <small>NEW income added to budget ONCE only!</small>
+    </div>
+
+    <!-- Form -->
+    <form id="income-form">
+      <label>Add Income Name</label>
+      <input
+        type="text"
+        id="income-name"
+        placeholder="e.g. Salary, Freelance, Business"
+      />
+
+      <label class="date">Add Income Date</label>
+      <input type="date" id="income-date" />
+
+      <label>Add Income Amount</label>
+      <input type="number" id="income-amount" placeholder="Amount" step="0.01" />
+
+      <div style="display: flex; gap: 10px;">
+        <button type="submit" id="submit">Save & Add to Budget</button>
+        <button type="button" id="cancel-btn" style="display:none;">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table -->
+  <div class="expense">
+    <table class="expense-table">
+      <thead>
+        <tr>
+          <th>S.NO</th>
+          <th>INCOME NAME</th>
+          <th>DATE</th>
+          <th>AMOUNT</th>
+          <th>EDIT</th>
+          <th>DELETE</th>
+        </tr>
+      </thead>
+      <tbody id="income-tbody">
+        <tr><td colspan="6">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>&copy; Expense Tracker</footer>
+
+</body>
+</html>
